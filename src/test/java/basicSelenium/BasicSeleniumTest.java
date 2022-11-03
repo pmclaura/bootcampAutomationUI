@@ -16,7 +16,7 @@ public class BasicSeleniumTest {
 
     @BeforeEach
     public void setup(){
-        System.setProperty("webdriver.chrome.driver","src/test/resources/driver/chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver","src/test/resources/driver/chromedriver");
         driver = new ChromeDriver();
         driver.get("http://todo.ly/");
     }
@@ -31,8 +31,8 @@ public class BasicSeleniumTest {
 
         // login
         driver.findElement(By.xpath("//img[contains(@src,'pagelogin')]")).click();
-        driver.findElement(By.id("ctl00_MainContent_LoginControl1_TextBoxEmail")).sendKeys("bootcamp@mojix44.com");
-        driver.findElement(By.id("ctl00_MainContent_LoginControl1_TextBoxPassword")).sendKeys("12345");
+        driver.findElement(By.id("ctl00_MainContent_LoginControl1_TextBoxEmail")).sendKeys("proof@gmail.com");
+        driver.findElement(By.id("ctl00_MainContent_LoginControl1_TextBoxPassword")).sendKeys("123");
         driver.findElement(By.id("ctl00_MainContent_LoginControl1_ButtonLogin")).click();
         Thread.sleep(1000);
         Assertions.assertTrue(driver.findElement(By.id("ctl00_HeaderTopControl1_LinkButtonLogout")).isDisplayed()
@@ -68,5 +68,44 @@ public class BasicSeleniumTest {
         actualResult=driver.findElements(By.xpath(" //td[text()='"+nameProject+"'] ")).size();
         Assertions.assertTrue(actualResult == 0
                 ,"ERROR The project was not removed");
+
+        // create Project
+        nameProject="BootcampQA"+new Date().getTime();
+        driver.findElement(By.xpath("//td[text()='Add New Project']")).click();
+        driver.findElement(By.id("NewProjNameInput")).sendKeys(nameProject);
+        driver.findElement(By.id("NewProjNameButton")).click();
+        Thread.sleep(1000);
+        actualResult=driver.findElements(By.xpath(" //td[text()='"+nameProject+"'] ")).size();
+        Assertions.assertTrue(actualResult >= 1
+                ,"ERROR The project was not created");
+
+        //create task
+        String nameTask = "TaskQA"+new Date().getTime();
+        driver.findElement(By.id("NewItemContentInput")).sendKeys(nameTask);
+        driver.findElement(By.id("NewItemAddButton")).click();
+        Thread.sleep(1000);
+        actualResult=driver.findElements(By.xpath(" //div[text()='"+nameTask+"'] ")).size();
+        Assertions.assertTrue(actualResult >= 1 ,
+                "ERROR The task was not created");
+
+        //update task
+        driver.findElement(By.xpath("//ul[@id='mainItemList']/li/div/table/tbody/tr/td/div[text()='"+nameTask+"']")).click();
+        String updateNameTask = "UpdateTaskQA" + new Date().getTime();
+        driver.findElement(By.xpath("//ul[@id='mainItemList']/li/div/table/tbody/tr/td/div/div/textarea")).clear();
+        driver.findElement(By.xpath("//ul[@id='mainItemList']/li/div/table/tbody/tr/td/div/div/textarea")).sendKeys(updateNameTask);
+        driver.findElement(By.xpath("//ul[@id='mainItemList']/li/div/table/tbody/tr/td/div/div/textarea")).click();
+        Thread.sleep(1000);
+        actualResult=driver.findElements(By.xpath(" //div[text()='"+updateNameTask+"'] ")).size();
+        Assertions.assertTrue(actualResult >= 1 ,
+                "ERROR The task was not updated");
+
+        //delete task
+        driver.findElement(By.xpath("//ul[@id='mainItemList']/li/div/table/tbody/tr/td/div[text()='"+updateNameTask+"']")).click();
+        driver.findElement(By.xpath("//ul[@id='mainItemList']/li/div/table/tbody/tr/td/div/img")).click();
+        driver.findElement(By.xpath("//ul[@id='itemContextMenu']/li/a[text()='Delete']")).click();
+        Thread.sleep(1000);
+        actualResult=driver.findElements(By.xpath(" //td/div[text()='"+updateNameTask+"'] ")).size();
+        Assertions.assertTrue(actualResult == 0 ,
+                "ERROR The task was not removed");
     }
 }
